@@ -37,9 +37,9 @@ body{
    Change these three variables to control the ACTUAL blur strength.
 */
 :root{
-  --math-frost-blur:9px;
-  --cs-frost-blur:9px;
-  --finance-frost-blur:10px;
+  --math-frost-blur:6px;
+  --cs-frost-blur:7px;
+  --finance-frost-blur:8px;
 }
 
 .chapter.parallax-active::after{
