@@ -6,27 +6,7 @@
   const clamp = n => Math.max(0, Math.min(1, n));
   const local = (p, start, end) => clamp((p - start) / Math.max(.001, end - start));
 
-  const chapters = [
-    ['math','01 / Mathematics'],
-    ['cs','02 / Computer Science'],
-    ['finance','03 / Finance'],
-    ['experience','04 / Experience'],
-    ['academics','05 / Academics']
-  ];
-
-  chapters.forEach(([id,label]) => {
-    const section = $(id);
-    if (!section) return;
-    section.classList.add('parallax-active');
-    if (section.querySelector(':scope > .parallax-divider')) return;
-    const divider = document.createElement('div');
-    divider.className = 'parallax-divider';
-    const [num,title] = label.split(' / ');
-    divider.innerHTML = `<span>${num}</span><strong>${title}</strong><span>scroll / explore</span>`;
-    section.insertBefore(divider, section.firstChild);
-  });
-
-  // Keep all sticky narrative elements aligned exactly beneath the real site header.
+  // Keep sticky background elements aligned exactly beneath the real site header.
   const siteHeader = document.querySelector('.site-header');
   function syncHeaderHeight(){
     const height = Math.max(0, Math.round(siteHeader?.getBoundingClientRect().height || 84));
