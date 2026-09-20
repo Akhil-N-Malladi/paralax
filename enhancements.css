@@ -95,7 +95,13 @@ html[data-theme="dark"] .book-cover-stage img{box-shadow:4px 5px 0 var(--shadow)
 .experience-list .experience-featured{position:relative;isolation:isolate;overflow:hidden;padding-left:28px;padding-right:24px;transition:transform .3s cubic-bezier(.2,.75,.2,1),background .3s ease,box-shadow .3s ease,border-color .3s ease}
 .experience-list .experience-featured:before{content:'';position:absolute;inset:0 auto 0 0;width:5px;background:#f34c28;z-index:-1}.experience-list .experience-featured.stanford:before{background:#b32638}.experience-list .experience-featured.upenn:before{background:#2457d6}
 .experience-list .experience-featured:after{content:attr(data-school);position:absolute;right:18px;bottom:-.19em;font-size:clamp(4rem,9vw,9rem);font-weight:900;letter-spacing:-.08em;line-height:1;color:rgba(23,23,20,.045);z-index:-1;pointer-events:none}
-.experience-list .experience-featured:hover{transform:translateX(8px);background:#ecece4}.experience-list .experience-featured.stanford:hover{box-shadow:0 0 0 1px rgba(179,38,56,.48),0 0 18px rgba(179,38,56,.38),0 0 46px rgba(179,38,56,.20)}.experience-list .experience-featured.upenn:hover{box-shadow:0 0 0 1px rgba(36,87,214,.48),0 0 18px rgba(36,87,214,.38),0 0 46px rgba(36,87,214,.20)}
+.experience-list .experience-featured:hover{transform:translateX(8px);box-shadow:none!important}
+.experience-list .experience-featured.stanford:hover{background:#a9273a!important;color:#fff6f7!important;border-color:#a9273a!important}
+.experience-list .experience-featured.upenn:hover{background:#2855b8!important;color:#f5f8ff!important;border-color:#2855b8!important}
+.experience-list .experience-featured.stanford:hover :is(.eyebrow,p,.experience-label,h3,.school-name){color:#fff1f3!important}
+.experience-list .experience-featured.upenn:hover :is(.eyebrow,p,.experience-label,h3,.school-name){color:#eef3ff!important}
+.experience-list .experience-featured.stanford:hover:after{color:rgba(255,241,243,.12)!important}
+.experience-list .experience-featured.upenn:hover:after{color:rgba(238,243,255,.12)!important}
 .experience-list .experience-featured h3{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 .experience-featured p strong{color:inherit;font-weight:700}
 html[data-theme="dark"] .book-cover-stage{background:var(--surface-2)!important}
@@ -103,7 +109,9 @@ html[data-theme="dark"] .book-cover-stage img{box-shadow:7px 9px 0 var(--shadow)
 html[data-theme="dark"] .book-cover-stage img:hover{box-shadow:10px 14px 0 var(--shadow)}
 html[data-theme="dark"] .book-cover-fallback{background:linear-gradient(145deg,#23271f,#171915);color:var(--ink);box-shadow:7px 9px 0 var(--shadow)}
 html[data-theme="dark"] .experience-list .experience-featured:after{color:rgba(242,242,234,.045)}
-html[data-theme="dark"] .experience-list .experience-featured:hover{background:var(--surface)!important}html[data-theme="dark"] .experience-list .experience-featured.stanford:hover{box-shadow:0 0 0 1px rgba(240,78,94,.58),0 0 22px rgba(240,78,94,.42),0 0 52px rgba(240,78,94,.24)}html[data-theme="dark"] .experience-list .experience-featured.upenn:hover{box-shadow:0 0 0 1px rgba(88,137,255,.62),0 0 22px rgba(88,137,255,.44),0 0 52px rgba(88,137,255,.24)}
+html[data-theme="dark"] .experience-list .experience-featured.stanford:hover{background:#7d1f2e!important;color:#fff4f5!important;border-color:#b83b4f!important;box-shadow:none!important}html[data-theme="dark"] .experience-list .experience-featured.upenn:hover{background:#1e3f8f!important;color:#f3f6ff!important;border-color:#3f6fd5!important;box-shadow:none!important}
+html[data-theme="dark"] .experience-list .experience-featured.stanford:hover :is(.eyebrow,p,.experience-label,h3,.school-name){color:#ffe9ec!important}
+html[data-theme="dark"] .experience-list .experience-featured.upenn:hover :is(.eyebrow,p,.experience-label,h3,.school-name){color:#e9efff!important}
 @media(max-width:700px){.book-cover-stage{min-height:245px;padding:14px}.book-cover-stage img{height:205px}.book-cover-stage img:only-child{height:225px}.book-cover-fallback{height:225px}.experience-list .experience-featured{padding-left:20px;padding-right:14px}.experience-list .experience-featured:after{font-size:4.5rem;right:8px}.school-name{font-size:inherit}}
 
 .book-description{font-size:.88rem;color:#55554e;line-height:1.55;max-width:38ch;margin-top:12px}
