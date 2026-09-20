@@ -15,7 +15,7 @@ body{
   background-image:
     linear-gradient(90deg, transparent 0 11.5%, var(--px-paper-margin) 11.5% 11.65%, transparent 11.65%),
     repeating-linear-gradient(0deg, transparent 0 30px, var(--px-paper-line) 30px 31px),
-    radial-gradient(circle at 20% 12%, rgba(255,255,255,.7), transparent 38%),
+    radial-gradient(circle at 20% 12%, rgba(255,255,255,.2), transparent 38%),
     linear-gradient(#eee9dc,#e8e1d2);
   background-attachment:fixed;
   transition:none;
