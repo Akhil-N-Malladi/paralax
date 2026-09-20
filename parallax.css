@@ -25,14 +25,51 @@ body{
 .chapter{position:relative;isolation:isolate}
 .chapter.parallax-active{background:transparent}
 .parallax-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-.chapter.parallax-active::after{
-  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-  backdrop-filter:blur(8px) saturate(.82);-webkit-backdrop-filter:blur(8px) saturate(.82);
-  background:rgba(244,240,229,1)
+/*
+   Frosting fix
+   -------------
+   The old version relied only on backdrop-filter on the chapter pseudo-element.
+   Because the animated backgrounds live inside their own sticky/positioned layer,
+   some browsers composite them separately and the backdrop blur can appear to do
+   nothing. The visible background panels are now blurred directly, with the
+   translucent chapter tint kept above them for the frosted-glass wash.
+
+   Change these three variables to control the ACTUAL blur strength.
+*/
+:root{
+  --math-frost-blur:9px;
+  --cs-frost-blur:9px;
+  --finance-frost-blur:10px;
 }
-#cs.chapter.parallax-active::after{background:rgba(3,7,4,.40);backdrop-filter:blur(8px) saturate(.68);-webkit-backdrop-filter:blur(8px) saturate(.68)}
-#finance.chapter.parallax-active::after{background:rgba(235,240,233,.38);backdrop-filter:blur(9px) saturate(.74);-webkit-backdrop-filter:blur(9px) saturate(.74)}
+
+.chapter.parallax-active::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:rgba(244,240,229,.14);
+}
+#cs.chapter.parallax-active::after{background:rgba(3,7,4,.38)}
+#finance.chapter.parallax-active::after{background:rgba(235,240,233,.34)}
 .chapter>*:not(.parallax-layer):not(.parallax-divider),.hero>*{position:relative;z-index:2}
+
+/* Direct blur fallback: this is what makes the frost visible reliably. */
+.journal-sheet{
+  filter:blur(var(--math-frost-blur)) saturate(.82);
+  transform:scale(1.018);
+  transform-origin:center center;
+}
+.terminal-screen{
+  filter:blur(var(--cs-frost-blur)) saturate(.72);
+  transform:scale(1.018);
+  transform-origin:center center;
+}
+.jnj-board{
+  filter:blur(var(--finance-frost-blur)) saturate(.78);
+  transform:scale(1.018);
+  transform-origin:center center;
+}
 
 
 /* ------------------------------------------------------------------
