@@ -27,11 +27,11 @@ body{
 .parallax-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
 .chapter.parallax-active::after{
   content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-  backdrop-filter:blur(9px) saturate(.82);-webkit-backdrop-filter:blur(9px) saturate(.82);
+  backdrop-filter:blur(7px) saturate(.82);-webkit-backdrop-filter:blur(7px) saturate(.82);
   background:rgba(244,240,229,.27)
 }
-#cs.chapter.parallax-active::after{background:rgba(3,7,4,.32);backdrop-filter:blur(10px) saturate(.72);-webkit-backdrop-filter:blur(10px) saturate(.72)}
-#finance.chapter.parallax-active::after{background:rgba(235,240,233,.30);backdrop-filter:blur(10px) saturate(.78);-webkit-backdrop-filter:blur(10px) saturate(.78)}
+#cs.chapter.parallax-active::after{background:rgba(3,7,4,.32);backdrop-filter:blur(7px) saturate(.72);-webkit-backdrop-filter:blur(7px) saturate(.72)}
+#finance.chapter.parallax-active::after{background:rgba(235,240,233,.30);backdrop-filter:blur(7px) saturate(.78);-webkit-backdrop-filter:blur(7px) saturate(.78)}
 .chapter>*:not(.parallax-layer):not(.parallax-divider),.hero>*{position:relative;z-index:2}
 
 /* Fully opaque chapter transition bar. */
