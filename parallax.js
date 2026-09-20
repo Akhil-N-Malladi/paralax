@@ -26,6 +26,16 @@
     section.insertBefore(divider, section.firstChild);
   });
 
+  // Keep all sticky narrative elements aligned exactly beneath the real site header.
+  const siteHeader = document.querySelector('.site-header');
+  function syncHeaderHeight(){
+    const height = Math.max(0, Math.round(siteHeader?.getBoundingClientRect().height || 84));
+    document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+  }
+  syncHeaderHeight();
+  if ('ResizeObserver' in window && siteHeader) new ResizeObserver(syncHeaderHeight).observe(siteHeader);
+  addEventListener('resize', syncHeaderHeight);
+
   /* ------------------------------------------------------------------
      MATH: journal paper + 2016 AIME I #15 geometry construction.
      The SVG is a faithful incidence sketch of the problem/solution setup:
@@ -110,45 +120,76 @@
   }
 
   /* ------------------------------------------------------------------
-     FINANCE: scroll-drawn JNJ visual with intentionally amplified swings.
-     It is decorative, not a literal historical price series.
+     FINANCE: scroll-built JNJ candlestick study with amplified swings.
+     The OHLC sequence is deliberately stylized for visual storytelling,
+     not presented as literal historical JNJ market data.
   ------------------------------------------------------------------ */
   const finance = $('finance');
   let financeLayer = null;
+  let financeCandles = [];
+  let financeVolumes = [];
+  const financeOHLC = [
+    [166,171,163,168,31],[169,174,167,171,26],[172,173,164,166,38],[165,177,164,174,45],
+    [175,176,167,169,33],[168,181,167,178,49],[179,180,171,173,35],[172,184,171,181,52],
+    [182,183,174,176,41],[175,188,174,185,56],[186,187,177,179,47],[178,186,177,183,36],
+    [184,185,172,175,58],[174,191,173,188,63],[189,190,179,182,46],[181,194,180,191,61],
+    [192,193,183,185,43],[184,192,183,189,39],[190,191,177,180,66],[179,197,178,194,71],
+    [195,196,184,187,54],[186,201,185,198,73],[199,201,189,192,51],[191,200,190,196,44],
+    [197,198,185,188,68],[187,205,186,202,77],[203,204,192,195,59],[194,209,193,205,82]
+  ];
   if (finance) {
-    const values = [158,166,153,172,160,181,167,186,171,193,177,188,169,197,181,204,187,199,176,207,191,214,196,205,186,218,201,224];
-    const w = 940, h = 430, padX = 46, padY = 55;
-    const min = 145, max = 230;
-    const x = i => padX + i/(values.length-1)*(w-padX*2);
-    const y = v => h-padY - (v-min)/(max-min)*(h-padY*2);
-    const path = values.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
-    const area = `${path} L${x(values.length-1).toFixed(1)},${(h-padY).toFixed(1)} L${x(0).toFixed(1)},${(h-padY).toFixed(1)} Z`;
-    const volumes = values.slice(1).map((v,i)=>Math.abs(v-values[i]) + 5);
-    const volumeBars = volumes.map((v,i)=>{
-      const bw = 15;
-      const bh = Math.min(50, v*2.1);
-      return `<rect class="jnj-volume" x="${(x(i+1)-bw/2).toFixed(1)}" y="${(h-20-bh).toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}"/>`;
+    const w = 940, h = 430, padX = 52, padY = 52, volumeFloor = h - 20;
+    const min = Math.min(...financeOHLC.map(d=>d[2])) - 4;
+    const max = Math.max(...financeOHLC.map(d=>d[1])) + 4;
+    const x = i => padX + i/(financeOHLC.length-1)*(w-padX*2);
+    const y = v => h-padY - (v-min)/(max-min)*(h-padY*2-34);
+    const bodyW = Math.max(9, Math.min(18,(w-padX*2)/financeOHLC.length*.56));
+    const maxVol = Math.max(...financeOHLC.map(d=>d[4]));
+
+    const candles = financeOHLC.map((d,i)=>{
+      const [open,high,low,close] = d;
+      const up = close >= open;
+      const yyOpen=y(open), yyClose=y(close), yyHigh=y(high), yyLow=y(low);
+      const top=Math.min(yyOpen,yyClose), bh=Math.max(3,Math.abs(yyClose-yyOpen));
+      return `<g class="jnj-candle ${up?'up':'down'}" data-candle="${i}">
+        <line class="wick" x1="${x(i).toFixed(1)}" y1="${yyHigh.toFixed(1)}" x2="${x(i).toFixed(1)}" y2="${yyLow.toFixed(1)}"/>
+        <rect class="body" x="${(x(i)-bodyW/2).toFixed(1)}" y="${top.toFixed(1)}" width="${bodyW.toFixed(1)}" height="${bh.toFixed(1)}"/>
+      </g>`;
     }).join('');
+
+    const volumes = financeOHLC.map((d,i)=>{
+      const up=d[3]>=d[0], bh=10 + d[4]/maxVol*42;
+      return `<rect class="jnj-volume ${up?'up':'down'}" data-volume="${i}" x="${(x(i)-bodyW/2).toFixed(1)}" y="${(volumeFloor-bh).toFixed(1)}" width="${bodyW.toFixed(1)}" height="${bh.toFixed(1)}"/>`;
+    }).join('');
+
+    const ma = financeOHLC.map((d,i,arr)=>{
+      const lo=Math.max(0,i-4); const chunk=arr.slice(lo,i+1); return chunk.reduce((sum,v)=>sum+v[3],0)/chunk.length;
+    });
+    const maPath=ma.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    const ticks=[Math.ceil(min/10)*10,Math.ceil(min/10)*10+10,Math.ceil(min/10)*10+20,Math.ceil(min/10)*10+30,Math.ceil(min/10)*10+40].filter(v=>v<=max);
 
     financeLayer = document.createElement('div');
     financeLayer.className = 'parallax-layer finance-parallax';
     financeLayer.setAttribute('aria-hidden','true');
     financeLayer.innerHTML = `
       <div class="jnj-board">
-        <div class="jnj-heading"><strong>JNJ</strong><span>Johnson & Johnson</span><span>scroll study / amplified volatility</span></div>
+        <div class="jnj-heading"><strong>JNJ</strong><span>Johnson & Johnson</span><span>28 sessions / volatility amplified</span></div>
         <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
           <g class="jnj-grid">
-            ${[150,170,190,210,230].map(v=>`<line x1="${padX}" y1="${y(v)}" x2="${w-padX}" y2="${y(v)}"/><text x="4" y="${y(v)+4}">$${v}</text>`).join('')}
+            ${ticks.map(v=>`<line x1="${padX}" y1="${y(v)}" x2="${w-padX}" y2="${y(v)}"/><text x="4" y="${y(v)+4}">$${v}</text>`).join('')}
             ${[0,7,14,21,27].map(i=>`<line x1="${x(i)}" y1="${padY}" x2="${x(i)}" y2="${h-padY}"/>`).join('')}
           </g>
-          <path class="jnj-area" d="${area}"/>
-          <path class="jnj-line" pathLength="1" d="${path}"/>
-          <g class="jnj-volumes">${volumeBars}</g>
-          <circle class="jnj-cursor" r="6" cx="${x(0)}" cy="${y(values[0])}"/>
+          <path class="jnj-ma" d="${maPath}"/>
+          <g class="jnj-candles">${candles}</g>
+          <g class="jnj-volumes">${volumes}</g>
+          <circle class="jnj-cursor" r="5" cx="${x(0)}" cy="${y(financeOHLC[0][3])}"/>
+          <g class="jnj-price-tag"><rect x="${w-82}" y="${y(financeOHLC[0][3])-11}" width="72" height="22" rx="2"/><text x="${w-46}" y="${y(financeOHLC[0][3])+4}" text-anchor="middle">$${financeOHLC[0][3]}</text></g>
         </svg>
-        <div class="jnj-axis"><span>START</span><span>VOLATILITY AMPLIFIED FOR VISUAL EFFECT</span><span>END</span></div>
+        <div class="jnj-axis"><span>EARLY</span><span>STYLIZED JNJ STUDY / AMPLIFIED VOLATILITY</span><span>RECENT</span></div>
       </div>`;
     finance.insertBefore(financeLayer, finance.children[1] || null);
+    financeCandles = Array.from(financeLayer.querySelectorAll('.jnj-candle'));
+    financeVolumes = Array.from(financeLayer.querySelectorAll('.jnj-volume'));
   }
 
   function progress(section) {
@@ -172,15 +213,46 @@
 
   function updateFinance(p) {
     if (!financeLayer) return;
-    financeLayer.style.setProperty('--fin-p', p.toFixed(4));
-    const line = financeLayer.querySelector('.jnj-line');
-    if (!line) return;
-    line.style.strokeDashoffset = String(1 - clamp(p));
-    const length = line.getTotalLength();
-    const point = line.getPointAtLength(length * clamp(p));
+    const q = clamp(p);
+    financeLayer.style.setProperty('--fin-p', q.toFixed(4));
+    const count = financeCandles.length;
+    let lastVisible = -1;
+    financeCandles.forEach((c,i)=>{
+      const start = i / Math.max(1,count) * .9;
+      const v = local(q,start,start+.09);
+      c.style.opacity = String(v);
+      c.style.transform = `translateY(${(1-v)*8}px) scaleY(${(.82+.18*v).toFixed(3)})`;
+      if (v > .5) lastVisible = i;
+    });
+    financeVolumes.forEach((bar,i)=>{
+      const start = i / Math.max(1,count) * .9;
+      const v = local(q,start,start+.08);
+      bar.style.opacity = String(v*.92);
+      bar.style.transform = `scaleY(${(.18+.82*v).toFixed(3)})`;
+    });
     const cursor = financeLayer.querySelector('.jnj-cursor');
-    cursor?.setAttribute('cx', point.x.toFixed(2));
-    cursor?.setAttribute('cy', point.y.toFixed(2));
+    const tag = financeLayer.querySelector('.jnj-price-tag');
+    if (lastVisible >= 0) {
+      const candle = financeCandles[lastVisible];
+      const body = candle.querySelector('.body');
+      const x = Number(body.getAttribute('x')) + Number(body.getAttribute('width'))/2;
+      const d = financeOHLC[lastVisible];
+      const boardSvg = candle.ownerSVGElement;
+      const h = 430, padY = 52;
+      const min = Math.min(...financeOHLC.map(v=>v[2])) - 4;
+      const max = Math.max(...financeOHLC.map(v=>v[1])) + 4;
+      const yy = h-padY - (d[3]-min)/(max-min)*(h-padY*2-34);
+      cursor?.setAttribute('cx', x.toFixed(2));
+      cursor?.setAttribute('cy', yy.toFixed(2));
+      if (cursor) cursor.style.opacity = String(Math.min(1,q*3));
+      if (tag) {
+        tag.style.opacity = String(Math.min(1,q*3));
+        const rect=tag.querySelector('rect'), text=tag.querySelector('text');
+        rect?.setAttribute('y',(yy-11).toFixed(2));
+        text?.setAttribute('y',(yy+4).toFixed(2));
+        if (text) text.textContent = `$${d[3].toFixed(2)}`;
+      }
+    }
   }
 
   let ticking = false;
